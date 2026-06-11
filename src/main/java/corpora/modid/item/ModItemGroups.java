@@ -15,10 +15,10 @@ import net.minecraft.util.Identifier;
 public class ModItemGroups {
 
     public static final ItemGroup CORPORA_ITEMS = Registry.register(Registries.ITEM_GROUP, Identifier.of(Corpora.MOD_ID, "corpora"),
-            FabricItemGroup.builder().icon(() -> new ItemStack(Registries.ITEM.get(1)))
+            FabricItemGroup.builder().icon(() -> new ItemStack(ModBlocks.SERVER_BLOCK))
                     .displayName(Text.translatable("itemgroup.corpora.corpora"))
                     .entries((displayContext, entries) -> {
-
+                        entries.add(ModBlocks.SERVER_BLOCK);
 
                     })
                     .build());

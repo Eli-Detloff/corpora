@@ -1,6 +1,7 @@
 package corpora.modid.block;
 
 import corpora.modid.Corpora;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -14,8 +15,13 @@ public class ModBlocks {
                 new BlockItem(block, new Item.Settings()));
     }
 
+    private static Block registerBlock(String name, Block block) {
+        registerBlockItem(name, block);
+        return Registry.register(Registries.BLOCK, Identifier.of(Corpora.MOD_ID, name), block);
+    }
 
 
+    public static Block SERVER_BLOCK = registerBlock("server_block", new Block(AbstractBlock.Settings.create()));
 
 
     public static void registerModBlocks(){

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "corpora:block/server_block"
+    }
+  }
+}
