@@ -1,7 +1,7 @@
-package corpora.modid.item;
+package corpora.modid.init;
 
 import corpora.modid.Corpora;
-import corpora.modid.CorporaDataGenerator;
+import corpora.modid.item.ShellItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -12,6 +12,9 @@ public class ModItems {
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registries.ITEM, Identifier.of(Corpora.MOD_ID, name), item);
     }
+
+    public static final Item SHELL_ITEM = registerItem("shell_item", new ShellItem(new Item.Settings()));
+    public static final Item SHELL_ITEM_BROKEN = registerItem("shell_item_broken", new Item(new Item.Settings()));
 
 
     public static void registerModItems() {

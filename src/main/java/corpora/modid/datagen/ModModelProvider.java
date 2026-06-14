@@ -1,6 +1,7 @@
 package corpora.modid.datagen;
 
-import corpora.modid.block.ModBlocks;
+import corpora.modid.init.ModBlocks;
+import corpora.modid.init.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.data.client.*;
@@ -34,18 +35,13 @@ public class ModModelProvider extends FabricModelProvider {
         );
 
 
-
-
     }
 
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-
+        itemModelGenerator.register(ModItems.SHELL_ITEM, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SHELL_ITEM_BROKEN, Models.GENERATED);
     }
-
-
-
-
 
 
 }

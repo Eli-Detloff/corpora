@@ -1,12 +1,9 @@
-package corpora.modid.item;
+package corpora.modid.init;
 
 import corpora.modid.Corpora;
-import corpora.modid.block.ModBlocks;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.block.IceBlock;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
@@ -19,6 +16,8 @@ public class ModItemGroups {
                     .displayName(Text.translatable("itemgroup.corpora.corpora"))
                     .entries((displayContext, entries) -> {
                         entries.add(ModBlocks.SERVER_BLOCK);
+                        entries.add(ModItems.SHELL_ITEM);
+                        entries.add(ModItems.SHELL_ITEM_BROKEN);
 
                     })
                     .build());

@@ -1,13 +1,11 @@
 {
   "item.corpora.shell_item": "Shell",
-  "item.corpora.shell_broken_item": "Broken Shell",
+  "item.corpora.shell_item_broken": "Broken Shell",
   "block.corpora.server_block": "Server Rack",
   "itemgroup.corpora.corpora": "Corpora",
   "effect.corpora.uploaded": "Uploaded",
   "entity.corpora.shell": "Robot Shell",
-
   "sounds.corpora.server_block_run": "",
-
   "sounds.corpora.shell_power_down": "",
   "sounds.corpora.shell_power_up": ""
 }

@@ -1,6 +1,6 @@
 package corpora.modid.datagen;
 
-import corpora.modid.block.ModBlocks;
+import corpora.modid.init.ModBlocks;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.registry.RegistryWrapper;

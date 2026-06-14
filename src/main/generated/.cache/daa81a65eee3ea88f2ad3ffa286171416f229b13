@@ -1,4 +1,6 @@
-// 1.21.1	2026-06-11T18:38:41.3773902	corpora/Model Definitions
+// 1.21.1	2026-06-14T16:05:25.5310563	corpora/Model Definitions
 345330a590b75a2b117f8a74b11ecb8854142e62 assets\corpora\models\item\server_block.json
+28e8b9f6559ef0c748cf7e5db8ffedaa6c87020c assets\corpora\models\item\shell_item_broken.json
 33be6f95bc6e5d2c883fa08b4486587a337a1364 assets\corpora\models\block\server_block.json
 0155ced89bff040a057235da6bcadcd90acb2358 assets\corpora\blockstates\server_block.json
+e97589410d7ce4e25844b1bd538a8cff8fcf8446 assets\corpora\models\item\shell_item.json
