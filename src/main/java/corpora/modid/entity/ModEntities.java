@@ -1,4 +1,5 @@
 package corpora.modid.entity;
+
 import corpora.modid.Corpora;
 import corpora.modid.entity.custom.ShellEntity;
 import net.minecraft.entity.EntityType;

@@ -4,10 +4,8 @@ import com.mojang.serialization.MapCodec;
 import corpora.modid.Corpora;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.RedstoneLampBlock;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -18,6 +16,7 @@ public class ServerBlock extends Block {
     public ServerBlock(Settings settings) {
         super(settings);
     }
+
     public static final MapCodec<ServerBlock> CODEC = createCodec(ServerBlock::new);
     public static boolean ISACTIVE;
 
@@ -41,14 +40,15 @@ public class ServerBlock extends Block {
     }
 
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (countCoolingBlocks(world, pos) >=9){
+        if (countCoolingBlocks(world, pos) >= 9) {
             ISACTIVE = true;
-        }else{
+        } else {
             ISACTIVE = false;
-        };
+        }
+        ;
 
 
-        if(ISACTIVE){
+        if (ISACTIVE) {
             Corpora.LOGGER.info("is powered at " + pos);
         }
     }

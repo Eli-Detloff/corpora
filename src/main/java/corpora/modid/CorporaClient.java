@@ -1,8 +1,8 @@
 package corpora.modid;
 
+import corpora.modid.entity.ModEntities;
 import corpora.modid.entity.client.ShellModel;
 import corpora.modid.entity.client.ShellRenderer;
-import corpora.modid.entity.ModEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
