@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
-      "model": "corpora:block/server_block"
+    "lit=false": {
+      "model": "corpora:block/server_block_off"
+    },
+    "lit=true": {
+      "model": "corpora:block/server_block_on"
     }
   }
 }

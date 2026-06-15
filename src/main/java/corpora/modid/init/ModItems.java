@@ -9,13 +9,12 @@ import net.minecraft.util.Identifier;
 
 public class ModItems {
 
-    private static Item registerItem(String name, Item item) {
-        return Registry.register(Registries.ITEM, Identifier.of(Corpora.MOD_ID, name), item);
-    }
-
     public static final Item SHELL_ITEM = registerItem("shell_item", new ShellItem(new Item.Settings()));
     public static final Item SHELL_ITEM_BROKEN = registerItem("shell_item_broken", new Item(new Item.Settings()));
 
+    private static Item registerItem(String name, Item item) {
+        return Registry.register(Registries.ITEM, Identifier.of(Corpora.MOD_ID, name), item);
+    }
 
     public static void registerModItems() {
         Corpora.LOGGER.info("Registering Mod Items for " + Corpora.MOD_ID);

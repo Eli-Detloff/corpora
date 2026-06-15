@@ -1,55 +1,87 @@
 package corpora.modid.block;
 
 import com.mojang.serialization.MapCodec;
-import corpora.modid.Corpora;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.block.RedstoneTorchBlock;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public class ServerBlock extends Block {
+    public static final MapCodec<ServerBlock> CODEC = createCodec(ServerBlock::new);
+    public static final BooleanProperty POWERED;
+
+    static {
+        POWERED = RedstoneTorchBlock.LIT;
+    }
+
     public ServerBlock(Settings settings) {
         super(settings);
     }
 
-    public static final MapCodec<ServerBlock> CODEC = createCodec(ServerBlock::new);
-    public static boolean ISACTIVE;
-
-    public static final List<BlockPos> COOLING_OFFSET = BlockPos.stream(-1, -1, -1, 1, 1, 1)
-            .filter((blockPos) -> Math.abs(blockPos.getX()) == 1 || Math.abs(blockPos.getZ()) == 1).map(BlockPos::toImmutable).toList();
-
-
-    public static boolean isValidCooling(World world, BlockPos blockPos, BlockPos blockPos2) {
-        return world.getBlockState(blockPos.add(blockPos2)).isIn(BlockTags.ICE);
+    public MapCodec<ServerBlock> getCodec() {
+        return CODEC;
     }
 
-    public static int countCoolingBlocks(World world, BlockPos pos) {
+    @Nullable
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        if (ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos())) {
+            ctx.getWorld().scheduleBlockTick(ctx.getBlockPos(), this, 1);
+        }
+        return this.getDefaultState().with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
+    }
 
-        int count = 0;
-        for (BlockPos offset : COOLING_OFFSET) {
-            if (isValidCooling(world, pos, offset)) {
-                count++;
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos,
+                                  Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        if (!world.isClient) {
+            boolean powered = world.isReceivingRedstonePower(pos);
+
+            if (powered != state.get(POWERED)) {
+                world.setBlockState(pos, state.with(POWERED, powered), 2);
+
+                if (powered) {
+                    world.scheduleBlockTick(pos, this, 1);
+                }
             }
         }
-        return count;
     }
 
+    @Override
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (countCoolingBlocks(world, pos) >= 9) {
-            ISACTIVE = true;
-        } else {
-            ISACTIVE = false;
-        }
-        ;
+        if (state.get(POWERED)) {
+            if (world.isReceivingRedstonePower(pos)) {
 
+                world.playSound(
+                        null,
+                        pos,
+                        SoundEvents.BLOCK_BEACON_AMBIENT,
+                        SoundCategory.BLOCKS,
+                        0.5f,
+                        1.0f
+                );
 
-        if (ISACTIVE) {
-            Corpora.LOGGER.info("is powered at " + pos);
+                // Play again in 40 ticks (2 seconds)
+                world.scheduleBlockTick(pos, this, 40);
+
+            } else {
+                world.setBlockState(pos, state.with(POWERED, false), 2);
+            }
         }
     }
+
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(POWERED);
+    }
+
+
 }

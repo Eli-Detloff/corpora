@@ -11,6 +11,9 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class ModBlocks {
+    public static Block SERVER_BLOCK = registerBlock("server_block", new ServerBlock(AbstractBlock.Settings.create()
+            .strength(1).luminance(state -> state.get(ServerBlock.POWERED) ? 10 : 0)));
+
     private static void registerBlockItem(String name, Block block) {
         Registry.register(Registries.ITEM, Identifier.of(Corpora.MOD_ID, name),
                 new BlockItem(block, new Item.Settings()));
@@ -20,10 +23,6 @@ public class ModBlocks {
         registerBlockItem(name, block);
         return Registry.register(Registries.BLOCK, Identifier.of(Corpora.MOD_ID, name), block);
     }
-
-
-    public static Block SERVER_BLOCK = registerBlock("server_block", new ServerBlock(AbstractBlock.Settings.create()));
-
 
     public static void registerModBlocks() {
         Corpora.LOGGER.info("Registering Modded Blocks for " + Corpora.MOD_ID);

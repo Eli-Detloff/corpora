@@ -16,6 +16,14 @@ public class ShellEntity extends AnimalEntity {
         super(entityType, world);
     }
 
+    public static DefaultAttributeContainer.Builder createAttributes() {
+        return MobEntity.createMobAttributes()
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
+                .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 20);
+
+
+    }
+
     @Override
     public boolean isBreedingItem(ItemStack stack) {
         return false;
@@ -33,13 +41,5 @@ public class ShellEntity extends AnimalEntity {
     @Override
     protected void initGoals() {
         super.initGoals();
-    }
-
-    public static DefaultAttributeContainer.Builder createAttributes() {
-        return MobEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
-                .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 20);
-
-
     }
 }
