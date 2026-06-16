@@ -28,6 +28,9 @@ public class MyShellOwnerComponent implements ShellOwnerComponent {
 
     @Override
     public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.putUuid("owner", owner);
+        if (owner != null) {
+            tag.putUuid("owner", owner);
+        }
+
     }
 }
