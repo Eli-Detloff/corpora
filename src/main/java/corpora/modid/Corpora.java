@@ -3,6 +3,7 @@ package corpora.modid;
 import corpora.modid.entity.ModEntities;
 import corpora.modid.entity.custom.ShellEntity;
 import corpora.modid.init.ModBlocks;
+import corpora.modid.init.ModCardinalComponents;
 import corpora.modid.init.ModItemGroups;
 import corpora.modid.init.ModItems;
 import net.fabricmc.api.ModInitializer;
@@ -25,6 +26,7 @@ public class Corpora implements ModInitializer {
         ModBlocks.registerModBlocks();
         ModItems.registerModItems();
         ModItemGroups.registerItemGroups();
+        ModCardinalComponents.register();
 
         FabricDefaultAttributeRegistry.register(ModEntities.SHELL, ShellEntity.createAttributes());
 
