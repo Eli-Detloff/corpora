@@ -1,15 +1,27 @@
 package corpora.modid;
 
+import corpora.modid.command.CleanUpEntities;
+import corpora.modid.command.ShellScreenCommand;
 import corpora.modid.entity.ModEntities;
 import corpora.modid.entity.custom.ShellEntity;
 import corpora.modid.init.ModBlocks;
 import corpora.modid.init.ModCardinalComponents;
 import corpora.modid.init.ModItemGroups;
 import corpora.modid.init.ModItems;
+import corpora.modid.networking.ModNetworking;
+import corpora.modid.networking.custom.SelectShellC2SPayload;
+import corpora.modid.networking.custom.ShellScreenS2CPacket;
+import corpora.modid.util.ShellRemoval;
+import corpora.modid.util.ShellTeleportHandler;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 public class Corpora implements ModInitializer {
     public static final String MOD_ID = "corpora";
@@ -27,8 +39,34 @@ public class Corpora implements ModInitializer {
         ModItems.registerModItems();
         ModItemGroups.registerItemGroups();
         ModCardinalComponents.register();
+        ModNetworking.register();
+        ShellRemoval.register();
 
         FabricDefaultAttributeRegistry.register(ModEntities.SHELL, ShellEntity.createAttributes());
+
+        PayloadTypeRegistry.playS2C().register(ShellScreenS2CPacket.ID, ShellScreenS2CPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(SelectShellC2SPayload.ID, SelectShellC2SPayload.CODEC);
+
+        ShellScreenCommand.register();
+        CleanUpEntities.register();
+
+
+        //packets
+        ServerPlayNetworking.registerGlobalReceiver(
+                SelectShellC2SPayload.ID,
+                (payload, context) -> {
+
+                    ServerPlayerEntity player = context.player();
+
+                    context.server().execute(() -> {
+
+                        UUID uuid = payload.shellId();
+
+                        ShellTeleportHandler teleportHandler = new ShellTeleportHandler();
+                        teleportHandler.ShellTeleport(player, uuid);
+                    });
+                }
+        );
 
     }
 }
