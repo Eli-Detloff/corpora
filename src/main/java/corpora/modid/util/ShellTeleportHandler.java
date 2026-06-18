@@ -1,16 +1,13 @@
 package corpora.modid.util;
 
 import corpora.modid.Corpora;
-import corpora.modid.block.ServerBlock;
 import corpora.modid.entity.ModEntities;
 import corpora.modid.entity.custom.ShellEntity;
 import corpora.modid.init.ModCardinalComponents;
 import io.github.apace100.apoli.Apoli;
-import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
 
@@ -23,42 +20,12 @@ public class ShellTeleportHandler {
     ) {
         player.sendMessage(Text.literal("Teleporting..."));
 
-        //find block pos of server block using players saved data
-        BlockPos serverPos = ModCardinalComponents.SERVERCOMP.get(player).getPos();
-        if (serverPos == null) {
-            player.sendMessage(Text.literal("Block pos is null or not in this dimension"));
-            Corpora.LOGGER.info("SERVERPOSCOMP is null");
-            return;
-        }
-
-        //checking block pos for server that is active
-        BlockState server = player.getWorld().getBlockState(serverPos);
-        if (server == null || !(server.getBlock() instanceof ServerBlock)) {
-            player.sendMessage(Text.literal("Server block was destroyed or does not exist"));
-            Corpora.LOGGER.info("no server block found at " + serverPos);
-            return;
-        }
-
-        //if not powered, return
-        if (!server.get(ServerBlock.POWERED)) {
-            player.sendMessage(Text.literal("Server block is not powered"));
-            Corpora.LOGGER.info("server is not powered at " + serverPos);
-            return;
-        }
-
 
         //find selected shell and load data
         ShellDataComponent targetShell = findShell(target);
         if (targetShell == null) {
             player.sendMessage(Text.literal("can not find shell of uuid " + target));
             Corpora.LOGGER.info("can not find shell of uuid " + target);
-            return;
-        }
-
-
-        if (targetShell.dimension() != ModCardinalComponents.SERVERCOMP.get(player).getDimension()) {
-            player.sendMessage(Text.literal("shell is not in the same dimension as selected server"));
-            Corpora.LOGGER.info("shell is not in the same dimension as selected server | server: " + ModCardinalComponents.SERVERCOMP.get(player).getDimension() + "  Shell: " + targetShell.dimension());
             return;
         }
 

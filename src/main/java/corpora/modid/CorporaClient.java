@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CorporaClient implements ClientModInitializer {
@@ -28,19 +27,12 @@ public class CorporaClient implements ClientModInitializer {
 
 
                     List<ShellDataComponent> shells = payload.shells();
-                    List<ShellDataComponent> match = new ArrayList<>();
-                    for (ShellDataComponent element : shells) {
-                        if (element.owner().equals(context.player().getUuid())) {
-                            match.add(element);
-                        }
-                    }
 
-
-                    if (match.isEmpty()) {
+                    if (shells.isEmpty()) {
                         context.player().sendMessage(Text.of("List empty"));
                         return;
                     }
-                    context.client().setScreen(new ShellGui(match));
+                    context.client().setScreen(new ShellGui(shells));
 
                 });
     }

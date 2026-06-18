@@ -13,6 +13,7 @@ import corpora.modid.networking.custom.SelectShellC2SPayload;
 import corpora.modid.networking.custom.ShellScreenS2CPacket;
 import corpora.modid.util.ShellRemoval;
 import corpora.modid.util.ShellTeleportHandler;
+import corpora.modid.util.config.ConfigManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -33,6 +34,9 @@ public class Corpora implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        //config
+        ConfigManager.load();
+
         //registration
         ModEntities.registerModEntities();
         ModBlocks.registerModBlocks();
