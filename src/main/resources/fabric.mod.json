@@ -16,8 +16,9 @@
   "environment": "*",
   "custom": {
     "cardinal-components": [
-      "corpora:server_pos_component",
-      "corpora:shell_owner_component"
+      "corpora:server_comp",
+      "corpora:shell_owner_component",
+      "corpora:current_shell_component"
     ]
   },
   "entrypoints": {
