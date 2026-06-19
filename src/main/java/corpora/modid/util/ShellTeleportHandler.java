@@ -47,7 +47,7 @@ public class ShellTeleportHandler {
             entity.setCustomName(Text.of(ModCardinalComponents.CURRENT_SHELL_COMPONENT.get(player).get()));
             entity.setHealth(player.getHealth());
             ModCardinalComponents.SHELL_OWNER_COMPONENT.get(entity).set(player.getUuid());
-            entity.storePlayerInventory(player);//store player inv <-----
+            entity.storePlayerInventory(player);
 
             player.getWorld().spawnEntity(entity);
         } else {
@@ -62,8 +62,8 @@ public class ShellTeleportHandler {
                 targetShell.pos().getX(),
                 targetShell.pos().getY(),
                 targetShell.pos().getZ(),
-                player.getYaw(),
-                player.getPitch()
+                targetShell.yaw(),
+                targetShell.pitch()
         );
 
         //debug things

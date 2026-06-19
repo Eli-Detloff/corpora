@@ -1,0 +1,16 @@
+{
+  "name": "UI",
+  "description": "Use server infastructure and a web of shells to colonize your chosen location",
+  "powers": [
+    "uiorigin:recipe",
+    "uiorigin:button",
+    "uiorigin:check",
+    "uiorigin:frail",
+    "uiorigin:strong"
+  ],
+  "unchoosable": false,
+  "icon": {
+    "id": "corpora:server_block"
+  },
+  "impact": 0
+}   

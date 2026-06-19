@@ -1,0 +1,20 @@
+{
+  "name": "Shell Form",
+  "description": "Regaining your physical form removes most weaknesses, but limits your speed",
+  "hidden": false,
+  "type": "origins:multiple",
+  "effects": {
+    "type": "origins:action_over_time",
+    "entity_action": {
+      "type": "origins:execute_command",
+      "command": "effect give @s minecraft:slowness 3 0 true"
+    },
+    "interval": 10,
+    "condition": {
+      "type": "origins:resource",
+      "resource": "uiorigin:check_status",
+      "comparison": "==",
+      "compare_to": 1
+    }
+  }
+}

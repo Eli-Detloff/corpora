@@ -8,6 +8,7 @@ import corpora.modid.init.*;
 import corpora.modid.networking.ModNetworking;
 import corpora.modid.networking.custom.SelectShellC2SPayload;
 import corpora.modid.networking.custom.ShellScreenS2CPacket;
+import corpora.modid.util.ShellDropEvent;
 import corpora.modid.util.ShellRemoval;
 import corpora.modid.util.ShellTeleportHandler;
 import corpora.modid.util.config.ConfigManager;
@@ -45,6 +46,7 @@ public class Corpora implements ModInitializer {
         ShellRemoval.register();
         DistanceManager.initialize();
         ModSounds.registerSounds();
+        ShellDropEvent.init();
 
         FabricDefaultAttributeRegistry.register(ModEntities.SHELL, ShellEntity.createAttributes());
 

@@ -1,0 +1,81 @@
+{
+  "name": "Server Power",
+  "description": "a more in depth description of the mod goes here",
+  "hidden": false,
+  "type": "origins:multiple",
+  "server": {
+    "type": "origins:recipe",
+    "recipe": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "###",
+        "C.C",
+        "###"
+      ],
+      "key": {
+        "#": {
+          "item": "minecraft:iron_block"
+        },
+        "C": {
+          "item": "minecraft:copper_block"
+        },
+        ".": {
+          "item": "minecraft:redstone_block"
+        }
+      },
+      "result": {
+        "id": "corpora:server_block",
+        "count": 1
+      }
+    }
+  },
+  "shell": {
+    "type": "origins:recipe",
+    "recipe": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "C#C",
+        "#.#",
+        "C#C"
+      ],
+      "key": {
+        "#": {
+          "item": "minecraft:iron_block"
+        },
+        "C": {
+          "item": "minecraft:copper_ingot"
+        },
+        ".": {
+          "item": "minecraft:redstone_block"
+        }
+      },
+      "result": {
+        "id": "corpora:shell_item",
+        "count": 1
+      }
+    }
+  },
+  "shell_broken": {
+    "type": "origins:recipe",
+    "recipe": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "###",
+        "#.#",
+        "###"
+      ],
+      "key": {
+        "#": {
+          "item": "minecraft:iron_ingot"
+        },
+        ".": {
+          "item": "corpora:shell_item_broken"
+        }
+      },
+      "result": {
+        "id": "corpora:shell_item",
+        "count": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "name": "Shell GUi",
+  "description": "If you have an active registered server, open a gui displaying all reigstered shells",
+  "hidden": false,
+  "type": "origins:multiple",
+  "activate": {
+    "type": "origins:active_self",
+    "entity_action": {
+      "type": "origins:if_else",
+      "condition": {
+        "type": "origins:resource",
+        "resource": "*:*_toggle",
+        "comparison": "==",
+        "compare_to": 0
+      },
+      "if_action": {
+        "type": "origins:and",
+        "actions": [
+          {
+            "type": "origins:change_resource",
+            "resource": "*:*_toggle",
+            "operation": "set",
+            "change": 1
+          },
+          {
+            "type": "origins:execute_command",
+            "command": "playsound corpora:shell_power_down player @s"
+          }
+        ]
+      },
+      "else_action": {
+        "type": "origins:and",
+        "actions": [
+          {
+            "type": "origins:change_resource",
+            "resource": "*:*_toggle",
+            "operation": "set",
+            "change": 0
+          },
+          {
+            "type": "origins:change_resource",
+            "resource": "*:*_resource",
+            "operation": "set",
+            "change": 50
+          }
+        ]
+      }
+    },
+    "cooldown": 1,
+    "hud_render": {
+      "should_render": false
+    },
+    "key": {
+      "key": "key.origins.primary_active"
+    }
+  },
+  "resource": {
+    "type": "origins:resource",
+    "min": 0,
+    "max": 50,
+    "hud_render": {
+      "condition": {
+        "type": "origins:resource",
+        "resource": "*:*_toggle",
+        "comparison": "==",
+        "compare_to": 1
+      }
+    },
+    "start_value": 50,
+    "min_action": {
+      "type": "origins:and",
+      "actions": [
+        {
+          "type": "origins:execute_command",
+          "command": "list_shells"
+        },
+        {
+          "type": "origins:change_resource",
+          "resource": "*:*_toggle",
+          "operation": "set",
+          "change": 0
+        },
+        {
+          "type": "origins:change_resource",
+          "resource": "*:*_resource",
+          "operation": "set",
+          "change": 50
+        }
+      ]
+    }
+  },
+  "toggle": {
+    "type": "origins:resource",
+    "min": 0,
+    "max": 1,
+    "hud_render": {
+      "should_render": false
+    },
+    "start_value": 0
+  },
+  "drain": {
+    "type": "origins:action_over_time",
+    "entity_action": {
+      "type": "origins:change_resource",
+      "resource": "*:*_resource",
+      "operation": "add",
+      "change": -1
+    },
+    "interval": 1,
+    "condition": {
+      "type": "origins:resource",
+      "resource": "*:*_toggle",
+      "comparison": "==",
+      "compare_to": 1
+    }
+  },
+  "effects": {
+    "type": "origins:action_over_time",
+    "entity_action": {
+      "type": "origins:and",
+      "actions": [
+        {
+          "type": "origins:execute_command",
+          "command": "effect give @s minecraft:blindness 2 0 true"
+        },
+        {
+          "type": "origins:execute_command",
+          "command": "effect give @s minecraft:slowness 1 10 true"
+        }
+      ]
+    },
+    "interval": 1,
+    "condition": {
+      "type": "origins:resource",
+      "resource": "*:*_toggle",
+      "comparison": "==",
+      "compare_to": 1
+    }
+  },
+  "damage_reset": {
+    "type": "origins:action_when_damage_taken",
+    "entity_action": {
+      "type": "origins:and",
+      "actions": [
+        {
+          "type": "origins:change_resource",
+          "resource": "*:*_toggle",
+          "operation": "set",
+          "change": 0
+        },
+        {
+          "type": "origins:change_resource",
+          "resource": "*:*_resource",
+          "operation": "set",
+          "change": 50
+        }
+      ]
+    },
+    "cooldown": 1,
+    "hud_render": {
+      "should_render": false
+    }
+  }
+}

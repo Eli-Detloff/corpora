@@ -1,0 +1,51 @@
+{
+  "name": "Frail Form",
+  "description": "if you are without a shell, gain speed but suffer extreme weakness",
+  "hidden": false,
+  "type": "origins:multiple",
+  "effects": {
+    "type": "origins:action_over_time",
+    "entity_action": {
+      "type": "origins:and",
+      "actions": [
+        {
+          "type": "origins:execute_command",
+          "command": "effect give @s minecraft:speed 3 0 true"
+        },
+        {
+          "type": "origins:execute_command",
+          "command": "effect give @s minecraft:weakness 1 0 true"
+        }
+      ]
+    },
+    "interval": 10,
+    "condition": {
+      "type": "origins:resource",
+      "resource": "uiorigin:check_status",
+      "comparison": "==",
+      "compare_to": 0
+    }
+  },
+  "transparent": {
+    "type": "origins:model_color",
+    "red": 1,
+    "green": 1,
+    "blue": 1,
+    "alpha": 0.7,
+    "condition": {
+      "type": "origins:resource",
+      "resource": "uiorigin:check_status",
+      "comparison": "==",
+      "compare_to": 0
+    }
+  },
+  "shake": {
+    "type": "origins:shaking",
+    "condition": {
+      "type": "origins:resource",
+      "resource": "uiorigin:check_status",
+      "comparison": "==",
+      "compare_to": 0
+    }
+  }
+}
