@@ -1,0 +1,20 @@
+{
+  "server_block_run": {
+    "subtitle": "sounds.corpora.server_block_run",
+    "sounds": [
+      "corpora:server_block_run"
+    ]
+  },
+  "shell_power_down": {
+    "subtitle": "sounds.corpora.shell_power_down",
+    "sounds": [
+      "corpora:shell_power_down"
+    ]
+  },
+  "shell_power_up": {
+    "subtitle": "sounds.corpora.shell_power_up",
+    "sounds": [
+      "corpora:shell_power_up"
+    ]
+  }
+}

@@ -4,16 +4,14 @@ import corpora.modid.command.CleanUpEntities;
 import corpora.modid.command.ShellScreenCommand;
 import corpora.modid.entity.ModEntities;
 import corpora.modid.entity.custom.ShellEntity;
-import corpora.modid.init.ModBlocks;
-import corpora.modid.init.ModCardinalComponents;
-import corpora.modid.init.ModItemGroups;
-import corpora.modid.init.ModItems;
+import corpora.modid.init.*;
 import corpora.modid.networking.ModNetworking;
 import corpora.modid.networking.custom.SelectShellC2SPayload;
 import corpora.modid.networking.custom.ShellScreenS2CPacket;
 import corpora.modid.util.ShellRemoval;
 import corpora.modid.util.ShellTeleportHandler;
 import corpora.modid.util.config.ConfigManager;
+import corpora.modid.util.distanceTracker.DistanceManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -45,6 +43,8 @@ public class Corpora implements ModInitializer {
         ModCardinalComponents.register();
         ModNetworking.register();
         ShellRemoval.register();
+        DistanceManager.initialize();
+        ModSounds.registerSounds();
 
         FabricDefaultAttributeRegistry.register(ModEntities.SHELL, ShellEntity.createAttributes());
 

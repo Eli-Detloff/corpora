@@ -14,6 +14,7 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -157,6 +158,17 @@ public class ShellEntity extends AnimalEntity {
                     brokenShell
             );
             this.getWorld().spawnEntity(itemEntity);
+
+
+            ServerPlayerEntity ownerPlayer = (ServerPlayerEntity) this.getWorld().getPlayerByUuid(ModCardinalComponents.SHELL_OWNER_COMPONENT.get(this).get());
+
+            if (ownerPlayer != null) {
+                ownerPlayer.sendMessage(
+                        this.getDamageTracker().getDeathMessage(),
+                        false
+                );
+            }
+
 
         }
     }

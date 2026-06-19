@@ -40,6 +40,7 @@ public class ShellScreenCommand {
                 !shell.owner().equals(player.getUuid())
         );
 
+
         BlockPos serverPos =
                 ModCardinalComponents.SERVERCOMP.get(player).getPos();
 
@@ -110,6 +111,21 @@ public class ShellScreenCommand {
             return 0;
         }
 
+        allShells.removeIf(shell -> !shell.pos().isWithinDistance(serverPos, ConfigManager.getConfig().serverBlockMaxRange));
+
+
+        //xp check
+        if (player.experienceLevel < ConfigManager.getConfig().tpExperienceLevelCost) {
+            player.sendMessage(Text.literal(
+                    "Minimum cost of " + ConfigManager.getConfig().tpExperienceLevelCost + " levels to swap"
+            ));
+            Corpora.LOGGER.info(
+                    "Player does not have enough xp to teleport. Has: {}, Needs: {}",
+                    player.experienceLevel,
+                    ConfigManager.getConfig().tpExperienceLevelCost
+            );
+            return 0;
+        }
 
         ShellScreenS2CPacket packet =
                 new ShellScreenS2CPacket(allShells);

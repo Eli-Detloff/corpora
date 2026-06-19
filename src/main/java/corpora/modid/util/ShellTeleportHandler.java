@@ -4,9 +4,12 @@ import corpora.modid.Corpora;
 import corpora.modid.entity.ModEntities;
 import corpora.modid.entity.custom.ShellEntity;
 import corpora.modid.init.ModCardinalComponents;
+import corpora.modid.init.ModSounds;
+import corpora.modid.util.config.ConfigManager;
 import io.github.apace100.apoli.Apoli;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 
 import java.util.UUID;
@@ -63,13 +66,26 @@ public class ShellTeleportHandler {
                 player.getPitch()
         );
 
+        //debug things
         player.sendMessage(Text.literal(
                 "shell " + targetShell.name() + " has " + targetShell.health() + " health"
         ), false);
 
+        targetWorld.playSound(
+                null,
+                targetShell.pos(),
+                ModSounds.SHELL_POWER_UP,
+                SoundCategory.BLOCKS,
+                0.5f,
+                1.0f
+        );
+
+
         player.setHealth(targetShell.health());
 
         ModCardinalComponents.CURRENT_SHELL_COMPONENT.get(player).set(targetShell.name());
+
+        player.addExperienceLevels(-ConfigManager.getConfig().tpExperienceLevelCost);
 
 
         ShellRemoval.add(targetWorld, targetShell.uuid(), 200, player);

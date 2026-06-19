@@ -89,19 +89,44 @@ public class ServerBlock extends Block {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient && state.get(POWERED)) {
-            ModCardinalComponents.SERVERCOMP.get(player).setPos(pos);
-            ModCardinalComponents.SERVERCOMP.get(player).setDimension(world.getRegistryKey());
+        if (!world.isClient) {
 
-            world.playSound(
-                    null,
-                    pos,
-                    SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE,
-                    SoundCategory.BLOCKS,
-                    0.5f,
-                    1.0f
-            );
-
+            if (ModCardinalComponents.SERVERCOMP.get(player).getPos() != null) {
+                if (ModCardinalComponents.SERVERCOMP.get(player).getPos().equals(pos)) {
+                    ModCardinalComponents.SERVERCOMP.get(player).setPos(null);
+                    ModCardinalComponents.SERVERCOMP.get(player).setDimension(null);
+                    world.playSound(
+                            null,
+                            pos,
+                            SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN,
+                            SoundCategory.BLOCKS,
+                            0.5f,
+                            1.0f
+                    );
+                } else {
+                    ModCardinalComponents.SERVERCOMP.get(player).setPos(pos);
+                    ModCardinalComponents.SERVERCOMP.get(player).setDimension(world.getRegistryKey());
+                    world.playSound(
+                            null,
+                            pos,
+                            SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE,
+                            SoundCategory.BLOCKS,
+                            0.5f,
+                            1.0f
+                    );
+                }
+            } else {
+                ModCardinalComponents.SERVERCOMP.get(player).setPos(pos);
+                ModCardinalComponents.SERVERCOMP.get(player).setDimension(world.getRegistryKey());
+                world.playSound(
+                        null,
+                        pos,
+                        SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE,
+                        SoundCategory.BLOCKS,
+                        0.5f,
+                        1.0f
+                );
+            }
         }
         return super.onUse(state, world, pos, player, hit);
     }
