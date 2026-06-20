@@ -184,9 +184,7 @@ public class ShellEntity extends AnimalEntity {
         }
 
 
-
-
-        if (!ModCardinalComponents.SHELL_OWNER_COMPONENT.get(this).get().equals(player.getUuid())){
+        if (!ModCardinalComponents.SHELL_OWNER_COMPONENT.get(this).get().equals(player.getUuid())) {
             return ActionResult.PASS;
         }
 
@@ -197,9 +195,6 @@ public class ShellEntity extends AnimalEntity {
 
         // Must be sneaking
         if (!player.isSneaking()) return ActionResult.PASS;
-
-
-
 
 
         ItemStack egg = new ItemStack(ModItems.SHELL_ITEM);

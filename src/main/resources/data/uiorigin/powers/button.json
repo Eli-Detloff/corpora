@@ -1,6 +1,6 @@
 {
   "name": "Shell GUi",
-  "description": "If you have an active registered server, open a gui displaying all reigstered shells",
+  "description": "If you have an active registered server, open a gui displaying all reigstered shells. It costs 2 experience levels to swap",
   "hidden": false,
   "type": "origins:multiple",
   "activate": {
