@@ -1,6 +1,6 @@
 {
-  "name": "Server Power",
-  "description": "a more in depth description of the mod goes here",
+  "name": "Server Network",
+  "description": "Your creator had a budget from the government. Unfortunately you do not have this luxury and must build up a system of your own. (craft a server and power it with redstone. Right click any server to set it as your active server. A server is required to swap bodies, but once setup you may swap with any shell within a set range (2000 blocks as of writing) You will know your server is setup correctly if you have a distance tracker. Shells are registered to the player who places them.)",
   "hidden": false,
   "type": "origins:multiple",
   "server": {

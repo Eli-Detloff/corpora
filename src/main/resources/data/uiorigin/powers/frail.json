@@ -1,6 +1,6 @@
 {
   "name": "Frail Form",
-  "description": "if you are without a shell, gain speed but suffer extreme weakness",
+  "description": "While a body is required for most combat, there is a freedom that comes from your true form. (gain speed and weakness when not piloting a shell)",
   "hidden": false,
   "type": "origins:multiple",
   "effects": {

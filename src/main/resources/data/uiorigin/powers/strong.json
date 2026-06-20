@@ -1,6 +1,6 @@
 {
   "name": "Shell Form",
-  "description": "Regaining your physical form removes most weaknesses, but limits your speed",
+  "description": "A body, while more limited, helps keep you grounded. (gain slowness when piloting shell, but remove weakness)",
   "hidden": false,
   "type": "origins:multiple",
   "effects": {
