@@ -1,7 +1,11 @@
 package corpora.modid.item;
 
+import corpora.modid.Corpora;
 import corpora.modid.entity.ModEntities;
 import corpora.modid.init.ModCardinalComponents;
+import io.github.apace100.origins.component.OriginComponent;
+import io.github.apace100.origins.origin.Origin;
+import io.github.apace100.origins.registry.ModComponents;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -12,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -31,6 +36,26 @@ public class ShellItem extends Item {
         if (!(world instanceof ServerWorld)) {
             return ActionResult.SUCCESS;
         } else {
+
+            assert context.getPlayer() != null;
+            OriginComponent component = ModComponents.ORIGIN.get(context.getPlayer());
+
+            for (Origin origin : component.getOrigins().values()) {
+                Corpora.LOGGER.info("Origin found: {}", origin.getId());
+            }
+
+            Identifier myOriginId = Identifier.of("uiorigin", "ui_origin");
+
+            boolean result = component.getOrigins()
+                    .values()
+                    .stream()
+                    .anyMatch(origin -> origin.getId().equals(myOriginId));
+
+            if (!result) {
+                return ActionResult.FAIL;
+            }
+
+
             ItemStack itemStack = context.getStack();
             BlockPos blockPos = context.getBlockPos();
             Direction direction = context.getSide();

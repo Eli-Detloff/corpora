@@ -7,6 +7,9 @@ import corpora.modid.networking.custom.ShellScreenS2CPacket;
 import corpora.modid.util.EntityRegistryState;
 import corpora.modid.util.ShellDataComponent;
 import corpora.modid.util.config.ConfigManager;
+import io.github.apace100.origins.component.OriginComponent;
+import io.github.apace100.origins.origin.Origin;
+import io.github.apace100.origins.registry.ModComponents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
@@ -15,6 +18,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -28,6 +32,25 @@ public class ShellScreenCommand {
         if (player == null) {
             return 0;
         }
+
+        //return if origin is not ui
+        OriginComponent component = ModComponents.ORIGIN.get(player);
+
+        for (Origin origin : component.getOrigins().values()) {
+            Corpora.LOGGER.info("Origin found: {}", origin.getId());
+        }
+
+        Identifier myOriginId = Identifier.of("uiorigin", "ui_origin");
+
+        boolean result = component.getOrigins()
+                .values()
+                .stream()
+                .anyMatch(origin -> origin.getId().equals(myOriginId));
+
+        if (!result) {
+            return 0;
+        }
+
 
         ArrayList<ShellDataComponent> allShells = new ArrayList<>();
 
