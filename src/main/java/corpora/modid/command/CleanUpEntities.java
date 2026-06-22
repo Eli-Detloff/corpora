@@ -2,15 +2,15 @@ package corpora.modid.command;
 
 import corpora.modid.util.EntityRegistryState;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 
 public class CleanUpEntities {
-    private static int execute(ServerCommandSource source) {
+    private static int execute(CommandSourceStack source) {
 
-        ServerWorld world = source.getWorld();
+        ServerLevel world = source.getLevel();
 
         EntityRegistryState state = EntityRegistryState.get(world);
 
@@ -22,8 +22,8 @@ public class CleanUpEntities {
 
         int removed = before - after;
 
-        source.sendFeedback(
-                () -> Text.literal("Cleaned registry. Removed " + removed + " dead entries."),
+        source.sendSuccess(
+                () -> Component.literal("Cleaned registry. Removed " + removed + " dead entries."),
                 true
         );
 
@@ -33,8 +33,8 @@ public class CleanUpEntities {
 
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
-                CommandManager.literal("cleanupentities")
-                        .requires(source -> source.hasPermissionLevel(2)) // OP only
+                Commands.literal("cleanupentities")
+                        .requires(source -> source.hasPermission(2)) // OP only
                         .executes(ctx -> execute(ctx.getSource()))
         ));
     }

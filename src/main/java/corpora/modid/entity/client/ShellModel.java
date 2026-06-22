@@ -1,22 +1,23 @@
 package corpora.modid.entity.client;
 
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import corpora.modid.Corpora;
 import corpora.modid.entity.custom.ShellEntity;
-import net.minecraft.client.model.*;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.client.render.entity.model.SinglePartEntityModel;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
+public class ShellModel<T extends ShellEntity> extends HierarchicalModel<T> {
 
-public class ShellModel<T extends ShellEntity> extends SinglePartEntityModel<T> {
-
-    public static final EntityModelLayer SHELL =
-            new EntityModelLayer(
-                    Identifier.of(Corpora.MOD_ID, "shell"),
+    public static final ModelLayerLocation SHELL =
+            new ModelLayerLocation(
+                    ResourceLocation.fromNamespaceAndPath(Corpora.MOD_ID, "shell"),
                     "main"
             );
 
@@ -46,178 +47,172 @@ public class ShellModel<T extends ShellEntity> extends SinglePartEntityModel<T> 
         this.leftLeg = this.root.getChild("left_leg");
     }
 
-    public static TexturedModelData getTexturedModelData() {
+    public static LayerDefinition getTexturedModelData() {
 
-        ModelData modelData = new ModelData();
-        ModelPartData rootData = modelData.getRoot();
+        MeshDefinition modelData = new MeshDefinition();
+        PartDefinition rootData = modelData.getRoot();
 
         // Root
-        ModelPartData root = rootData.addChild(
+        PartDefinition root = rootData.addOrReplaceChild(
                 "root",
-                ModelPartBuilder.create(),
-                ModelTransform.pivot(0.0F, 24.0F, 0.0F)
+                CubeListBuilder.create(),
+                PartPose.offset(0.0F, 24.0F, 0.0F)
         );
 
         // Waist
-        ModelPartData waist = root.addChild(
+        PartDefinition waist = root.addOrReplaceChild(
                 "waist",
-                ModelPartBuilder.create(),
-                ModelTransform.pivot(0.0F, -12.0F, 0.0F)
+                CubeListBuilder.create(),
+                PartPose.offset(0.0F, -12.0F, 0.0F)
         );
 
         // Head
-        ModelPartData head = waist.addChild(
+        PartDefinition head = waist.addOrReplaceChild(
                 "head",
-                ModelPartBuilder.create()
-                        .uv(0, 0)
-                        .cuboid(
+                CubeListBuilder.create()
+                        .texOffs(0, 0)
+                        .addBox(
                                 -4.0F, -8.0F, -4.0F,
                                 8.0F, 8.0F, 8.0F,
-                                new Dilation(0.0F)
+                                new CubeDeformation(0.0F)
                         )
-                        .uv(32, 0)
-                        .cuboid(
+                        .texOffs(32, 0)
+                        .addBox(
                                 -4.0F, -8.0F, -4.0F,
                                 8.0F, 8.0F, 8.0F,
-                                new Dilation(0.5F)
+                                new CubeDeformation(0.5F)
                         ),
-                ModelTransform.pivot(0.0F, -12.0F, 0.0F)
+                PartPose.offset(0.0F, -12.0F, 0.0F)
         );
 
         // Body
-        ModelPartData body = waist.addChild(
+        PartDefinition body = waist.addOrReplaceChild(
                 "body",
-                ModelPartBuilder.create()
-                        .uv(16, 16)
-                        .cuboid(
+                CubeListBuilder.create()
+                        .texOffs(16, 16)
+                        .addBox(
                                 -4.0F, 0.0F, -2.0F,
                                 8.0F, 12.0F, 4.0F
                         )
-                        .uv(16, 32)
-                        .cuboid(
+                        .texOffs(16, 32)
+                        .addBox(
                                 -4.0F, 0.0F, -2.0F,
                                 8.0F, 12.0F, 4.0F,
-                                new Dilation(0.25F)
+                                new CubeDeformation(0.25F)
                         ),
-                ModelTransform.pivot(0.0F, -12.0F, 0.0F)
+                PartPose.offset(0.0F, -12.0F, 0.0F)
         );
 
         // Right Arm
-        ModelPartData rightArm = waist.addChild(
+        PartDefinition rightArm = waist.addOrReplaceChild(
                 "right_arm",
-                ModelPartBuilder.create()
-                        .uv(40, 16)
-                        .cuboid(
+                CubeListBuilder.create()
+                        .texOffs(40, 16)
+                        .addBox(
                                 -2.0F, -2.0F, -2.0F,
                                 3.0F, 12.0F, 4.0F
                         )
-                        .uv(40, 32)
-                        .cuboid(
+                        .texOffs(40, 32)
+                        .addBox(
                                 -2.0F, -2.0F, -2.0F,
                                 3.0F, 12.0F, 4.0F,
-                                new Dilation(0.25F)
+                                new CubeDeformation(0.25F)
                         ),
-                ModelTransform.pivot(-5.0F, -10.0F, 0.0F)
+                PartPose.offset(-5.0F, -10.0F, 0.0F)
         );
 
         // Left Arm
-        ModelPartData leftArm = waist.addChild(
+        PartDefinition leftArm = waist.addOrReplaceChild(
                 "left_arm",
-                ModelPartBuilder.create()
-                        .uv(32, 48)
-                        .cuboid(
+                CubeListBuilder.create()
+                        .texOffs(32, 48)
+                        .addBox(
                                 -1.0F, -2.0F, -2.0F,
                                 3.0F, 12.0F, 4.0F
                         )
-                        .uv(48, 48)
-                        .cuboid(
+                        .texOffs(48, 48)
+                        .addBox(
                                 -1.0F, -2.0F, -2.0F,
                                 3.0F, 12.0F, 4.0F,
-                                new Dilation(0.25F)
+                                new CubeDeformation(0.25F)
                         ),
-                ModelTransform.pivot(5.0F, -10.0F, 0.0F)
+                PartPose.offset(5.0F, -10.0F, 0.0F)
         );
 
         // Right Leg
-        ModelPartData rightLeg = root.addChild(
+        PartDefinition rightLeg = root.addOrReplaceChild(
                 "right_leg",
-                ModelPartBuilder.create()
-                        .uv(0, 16)
-                        .cuboid(
+                CubeListBuilder.create()
+                        .texOffs(0, 16)
+                        .addBox(
                                 -2.0F, 0.0F, -2.0F,
                                 4.0F, 12.0F, 4.0F
                         )
-                        .uv(0, 32)
-                        .cuboid(
+                        .texOffs(0, 32)
+                        .addBox(
                                 -2.0F, 0.0F, -2.0F,
                                 4.0F, 12.0F, 4.0F,
-                                new Dilation(0.25F)
+                                new CubeDeformation(0.25F)
                         ),
-                ModelTransform.pivot(-1.9F, -12.0F, 0.0F)
+                PartPose.offset(-1.9F, -12.0F, 0.0F)
         );
 
         // Left Leg
-        ModelPartData leftLeg = root.addChild(
+        PartDefinition leftLeg = root.addOrReplaceChild(
                 "left_leg",
-                ModelPartBuilder.create()
-                        .uv(16, 48)
-                        .cuboid(
+                CubeListBuilder.create()
+                        .texOffs(16, 48)
+                        .addBox(
                                 -2.0F, 0.0F, -2.0F,
                                 4.0F, 12.0F, 4.0F
                         )
-                        .uv(0, 48)
-                        .cuboid(
+                        .texOffs(0, 48)
+                        .addBox(
                                 -2.0F, 0.0F, -2.0F,
                                 4.0F, 12.0F, 4.0F,
-                                new Dilation(0.25F)
+                                new CubeDeformation(0.25F)
                         ),
-                ModelTransform.pivot(1.9F, -12.0F, 0.0F)
+                PartPose.offset(1.9F, -12.0F, 0.0F)
         );
 
-        return TexturedModelData.of(modelData, 64, 64);
+        return LayerDefinition.create(modelData, 64, 64);
     }
 
-    @Override
-    public void setAngles(
-            T entity,
-            float limbSwing,
-            float limbSwingAmount,
-            float ageInTicks,
-            float netHeadYaw,
-            float headPitch
-    ) {
 
-        this.getPart().traverse().forEach(ModelPart::resetTransform);
+    @Override
+    public void setupAnim(T entity, float f, float g, float h, float i, float j) {
+
+        this.root().getAllParts().forEach(ModelPart::resetPose);
 
         // Head rotation
-        this.head.yaw = netHeadYaw * 0.017453292F;
-        this.head.pitch = headPitch * 0.017453292F;
+        this.head.yRot = i * 0.017453292F;
+        this.head.xRot = j * 0.017453292F;
 
         // Walking animation
-        this.rightLeg.pitch =
-                MathHelper.cos(limbSwing * 0.6662F)
+        this.rightLeg.xRot =
+                Mth.cos(f * 0.6662F)
                         * 1.4F
-                        * limbSwingAmount;
+                        * g;
 
-        this.leftLeg.pitch =
-                MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI)
+        this.leftLeg.xRot =
+                Mth.cos(f * 0.6662F + (float) Math.PI)
                         * 1.4F
-                        * limbSwingAmount;
+                        * g;
 
-        this.rightArm.pitch =
-                MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI)
+        this.rightArm.xRot =
+                Mth.cos(f * 0.6662F + (float) Math.PI)
                         * 1.4F
-                        * limbSwingAmount;
+                        * g;
 
-        this.leftArm.pitch =
-                MathHelper.cos(limbSwing * 0.6662F)
+        this.leftArm.xRot =
+                Mth.cos(f * 0.6662F)
                         * 1.4F
-                        * limbSwingAmount;
+                        * g;
     }
 
     @Override
-    public void render(
-            MatrixStack matrices,
+    public void renderToBuffer(
+            PoseStack matrices,
             VertexConsumer vertices,
             int light,
             int overlay,
@@ -228,7 +223,9 @@ public class ShellModel<T extends ShellEntity> extends SinglePartEntityModel<T> 
     }
 
     @Override
-    public ModelPart getPart() {
+    public ModelPart root() {
         return root;
     }
+
+
 }

@@ -2,8 +2,8 @@ package corpora.modid.component.cardinal.components;
 
 
 import corpora.modid.component.cardinal.interfaces.CurrentShellComponent;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 
 public class MyCurrentShellComponent implements CurrentShellComponent {
     private String name = null;
@@ -24,14 +24,14 @@ public class MyCurrentShellComponent implements CurrentShellComponent {
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         if (tag.contains("name")) {
             this.name = tag.getString("name");
         }
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         if (this.name != null) {
             tag.putString("name", name);
         }

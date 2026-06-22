@@ -1,13 +1,13 @@
 package corpora.modid.util;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,42 +21,42 @@ public record ShellDataComponent(
         float pitch,
         float headYaw,
         float bodyYaw,
-        RegistryKey<World> dimension,
+        ResourceKey<Level> dimension,
         String name,
         float health
 ) {
 
-    public static final PacketCodec<RegistryByteBuf, ShellDataComponent> CODEC =
-            PacketCodec.of(
+    public static final StreamCodec<RegistryFriendlyByteBuf, ShellDataComponent> CODEC =
+            StreamCodec.ofMember(
                     (value, buf) -> {
-                        Uuids.PACKET_CODEC.encode(buf, value.uuid());
-                        Uuids.PACKET_CODEC.encode(buf, value.owner());
-                        BlockPos.PACKET_CODEC.encode(buf, value.pos());
-                        PacketCodecs.FLOAT.encode(buf, value.yaw());
-                        PacketCodecs.FLOAT.encode(buf, value.pitch());
-                        PacketCodecs.FLOAT.encode(buf, value.headYaw());
-                        PacketCodecs.FLOAT.encode(buf, value.bodyYaw());
-                        RegistryKey.createPacketCodec(RegistryKeys.WORLD)
+                        UUIDUtil.STREAM_CODEC.encode(buf, value.uuid());
+                        UUIDUtil.STREAM_CODEC.encode(buf, value.owner());
+                        BlockPos.STREAM_CODEC.encode(buf, value.pos());
+                        ByteBufCodecs.FLOAT.encode(buf, value.yaw());
+                        ByteBufCodecs.FLOAT.encode(buf, value.pitch());
+                        ByteBufCodecs.FLOAT.encode(buf, value.headYaw());
+                        ByteBufCodecs.FLOAT.encode(buf, value.bodyYaw());
+                        ResourceKey.streamCodec(Registries.DIMENSION)
                                 .encode(buf, value.dimension());
-                        PacketCodecs.STRING.encode(buf, value.name());
-                        PacketCodecs.FLOAT.encode(buf, value.health());
+                        ByteBufCodecs.STRING_UTF8.encode(buf, value.name());
+                        ByteBufCodecs.FLOAT.encode(buf, value.health());
                     },
                     buf -> new ShellDataComponent(
-                            Uuids.PACKET_CODEC.decode(buf),
-                            Uuids.PACKET_CODEC.decode(buf),
-                            BlockPos.PACKET_CODEC.decode(buf),
-                            PacketCodecs.FLOAT.decode(buf),
-                            PacketCodecs.FLOAT.decode(buf),
-                            PacketCodecs.FLOAT.decode(buf),
-                            PacketCodecs.FLOAT.decode(buf),
-                            RegistryKey.createPacketCodec(RegistryKeys.WORLD).decode(buf),
-                            PacketCodecs.STRING.decode(buf),
-                            PacketCodecs.FLOAT.decode(buf)
+                            UUIDUtil.STREAM_CODEC.decode(buf),
+                            UUIDUtil.STREAM_CODEC.decode(buf),
+                            BlockPos.STREAM_CODEC.decode(buf),
+                            ByteBufCodecs.FLOAT.decode(buf),
+                            ByteBufCodecs.FLOAT.decode(buf),
+                            ByteBufCodecs.FLOAT.decode(buf),
+                            ByteBufCodecs.FLOAT.decode(buf),
+                            ResourceKey.streamCodec(Registries.DIMENSION).decode(buf),
+                            ByteBufCodecs.STRING_UTF8.decode(buf),
+                            ByteBufCodecs.FLOAT.decode(buf)
                     )
             );
 
-    public static final PacketCodec<RegistryByteBuf, List<ShellDataComponent>> LIST_CODEC =
-            PacketCodecs.collection(
+    public static final StreamCodec<RegistryFriendlyByteBuf, List<ShellDataComponent>> LIST_CODEC =
+            ByteBufCodecs.collection(
                     ArrayList::new,
                     CODEC
             );

@@ -1,8 +1,8 @@
 package corpora.modid.util.distanceTracker;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 public class DistanceDisplay {
 
@@ -12,30 +12,30 @@ public class DistanceDisplay {
         this.maxDistance = maxDistance;
     }
 
-    public void update(ServerPlayerEntity player, double distance) {
-        Formatting color = getColor(distance);
+    public void update(ServerPlayer player, double distance) {
+        ChatFormatting color = getColor(distance);
 
-        Text message = Text.literal(
+        Component message = Component.literal(
                 String.format("Distance: %d", (int) Math.round(distance))
-        ).formatted(color);
+        ).withStyle(color);
 
-        player.sendMessage(message, true); // Action bar
+        player.displayClientMessage(message, true); // Action bar
     }
 
-    private Formatting getColor(double distance) {
+    private ChatFormatting getColor(double distance) {
         double percent = distance / maxDistance;
 
         if (percent >= 1.0) {
-            return Formatting.DARK_RED;
+            return ChatFormatting.DARK_RED;
         } else if (percent >= 0.9) {
-            return Formatting.RED;
+            return ChatFormatting.RED;
         } else if (percent >= 0.75) {
-            return Formatting.GOLD;
+            return ChatFormatting.GOLD;
         } else if (percent >= 0.5) {
-            return Formatting.YELLOW;
+            return ChatFormatting.YELLOW;
         }
 
-        return Formatting.GREEN;
+        return ChatFormatting.GREEN;
     }
 
 

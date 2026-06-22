@@ -4,9 +4,9 @@ package corpora.modid.gui;
 import corpora.modid.networking.custom.SelectShellC2SPayload;
 import corpora.modid.util.ShellDataComponent;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
@@ -20,12 +20,12 @@ public class ShellGui extends Screen {
     private static final int VISIBLE_ENTRIES = 8;
 
     public ShellGui(List<ShellDataComponent> shells) {
-        super(Text.literal("Shells"));
+        super(Component.literal("Shells"));
         this.shells = shells;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
 
 
         context.fill(0, 0, width, height, 0xAA000000);
@@ -34,8 +34,8 @@ public class ShellGui extends Screen {
         int startY = 40;
         int boxWidth = 220;
 
-        context.drawCenteredTextWithShadow(
-                textRenderer,
+        context.drawCenteredString(
+                font,
                 "Available Shells",
                 centerX,
                 20,
@@ -61,13 +61,13 @@ public class ShellGui extends Screen {
 
             context.fill(x, y, x + boxWidth, y + 20, color);
 
-            String shellDimension = String.valueOf(shell.dimension().getValue())
+            String shellDimension = String.valueOf(shell.dimension().location())
                     .replace("minecraft:", "");
             ;
             String shellPosition = shell.pos().getX() + "," + shell.pos().getY() + "," + shell.pos().getZ();
 
-            context.drawText(
-                    textRenderer,
+            context.drawString(
+                    font,
                     (shell.name() + " (" + shellDimension + ") Pos:" + shellPosition),
                     x + 8,
                     y + 6,
@@ -131,16 +131,16 @@ public class ShellGui extends Screen {
                 )
         );
 
-        close();
+        onClose();
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {
         // removes blur
     }
 

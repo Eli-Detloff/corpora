@@ -4,23 +4,23 @@ import corpora.modid.Corpora;
 import corpora.modid.init.ModCardinalComponents;
 import corpora.modid.init.ModItems;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 
 public class ShellDropEvent {
     public static void init() {
 
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
 
-            if (!(entity instanceof ServerPlayerEntity player)) {
+            if (!(entity instanceof ServerPlayer player)) {
                 return;
             }
 
             String component = ModCardinalComponents.CURRENT_SHELL_COMPONENT.get(player).get();
 
             if (component == null) {
-                Corpora.LOGGER.info("no component found for death of {}", player.getPlayerListName());
+                Corpora.LOGGER.info("no component found for death of {}", player.getTabListDisplayName());
                 return;
             }
 
@@ -30,14 +30,14 @@ public class ShellDropEvent {
 
             // Drop at death location
             ItemEntity itemEntity = new ItemEntity(
-                    player.getWorld(),
+                    player.level(),
                     player.getX(),
                     player.getY(),
                     player.getZ(),
                     brokenShell
             );
 
-            player.getWorld().spawnEntity(itemEntity);
+            player.level().addFreshEntity(itemEntity);
             ModCardinalComponents.CURRENT_SHELL_COMPONENT.get(player).set(null);
 
         });

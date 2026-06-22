@@ -1,8 +1,8 @@
 package corpora.modid.component.cardinal.components;
 
 import corpora.modid.component.cardinal.interfaces.ShellOwnerComponent;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.UUID;
 
@@ -20,16 +20,16 @@ public class MyShellOwnerComponent implements ShellOwnerComponent {
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         if (tag.contains("owner")) {
-            owner = tag.getUuid("owner");
+            owner = tag.getUUID("owner");
         }
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         if (owner != null) {
-            tag.putUuid("owner", owner);
+            tag.putUUID("owner", owner);
         }
 
     }

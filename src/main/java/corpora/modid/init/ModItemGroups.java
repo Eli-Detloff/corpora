@@ -2,22 +2,22 @@ package corpora.modid.init;
 
 import corpora.modid.Corpora;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 
 public class ModItemGroups {
 
-    public static final ItemGroup CORPORA_ITEMS = Registry.register(Registries.ITEM_GROUP, Identifier.of(Corpora.MOD_ID, "corpora"),
+    public static final CreativeModeTab CORPORA_ITEMS = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(Corpora.MOD_ID, "corpora"),
             FabricItemGroup.builder().icon(() -> new ItemStack(ModBlocks.SERVER_BLOCK))
-                    .displayName(Text.translatable("itemgroup.corpora.corpora"))
-                    .entries((displayContext, entries) -> {
-                        entries.add(ModBlocks.SERVER_BLOCK);
-                        entries.add(ModItems.SHELL_ITEM);
-                        entries.add(ModItems.SHELL_ITEM_BROKEN);
+                    .title(Component.translatable("itemgroup.corpora.corpora"))
+                    .displayItems((displayContext, entries) -> {
+                        entries.accept(ModBlocks.SERVER_BLOCK);
+                        entries.accept(ModItems.SHELL_ITEM);
+                        entries.accept(ModItems.SHELL_ITEM_BROKEN);
 
                     })
                     .build());

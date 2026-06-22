@@ -4,41 +4,41 @@ import corpora.modid.init.ModCardinalComponents;
 import corpora.modid.init.ModItems;
 import corpora.modid.util.EntityRegistryState;
 import corpora.modid.util.ShellDataComponent;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class ShellEntity extends AnimalEntity {
+public class ShellEntity extends Animal {
 
-    DefaultedList<ItemStack> inventory = DefaultedList.ofSize(41, ItemStack.EMPTY);
+    NonNullList<ItemStack> inventory = NonNullList.withSize(41, ItemStack.EMPTY);
 
-    public ShellEntity(EntityType<? extends AnimalEntity> entityType, World world) {
+    public ShellEntity(EntityType<? extends Animal> entityType, Level world) {
         super(entityType, world);
     }
 
-    public static DefaultAttributeContainer.Builder createAttributes() {
-        return MobEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20)
-                .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 20);
+    public static AttributeSupplier.Builder createAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 20)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 20);
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack stack) {
+    public boolean isFood(ItemStack stack) {
         return false;
     }
 
@@ -47,19 +47,19 @@ public class ShellEntity extends AnimalEntity {
     }
 
     @Override
-    public @Nullable PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
+    public @Nullable AgeableMob getBreedOffspring(ServerLevel world, AgeableMob entity) {
         return null;
     }
 
     @Override
-    protected void initGoals() {
-        super.initGoals();
+    protected void registerGoals() {
+        super.registerGoals();
     }
 
     public void tick() {
         super.tick();
 
-        if (this.getWorld().isClient) return;
+        if (this.level().isClientSide) return;
         if (!this.isAlive()) return;
 
         float health = this.getHealth();
@@ -68,17 +68,17 @@ public class ShellEntity extends AnimalEntity {
         if (health <= 0.0F) return;
 
         EntityRegistryState state =
-                EntityRegistryState.get((ServerWorld) this.getWorld());
+                EntityRegistryState.get((ServerLevel) this.level());
 
         ShellDataComponent data = new ShellDataComponent(
-                this.getUuid(),
+                this.getUUID(),
                 ModCardinalComponents.SHELL_OWNER_COMPONENT.get(this).get(),
-                this.getBlockPos(),
-                this.getYaw(),
-                this.getPitch(),
-                this.headYaw,
-                this.bodyYaw,
-                this.getWorld().getRegistryKey(),
+                this.blockPosition(),
+                this.getYRot(),
+                this.getXRot(),
+                this.yHeadRot,
+                this.yBodyRot,
+                this.level().dimension(),
                 this.getName().getString(),
                 health
         );
@@ -89,48 +89,48 @@ public class ShellEntity extends AnimalEntity {
 
     @Override
     public void remove(RemovalReason reason) {
-        if (!this.getWorld().isClient) {
-            if (this.getWorld() instanceof ServerWorld serverWorld) {
-                System.out.println("REMOVING: " + this.getUuid());
+        if (!this.level().isClientSide) {
+            if (this.level() instanceof ServerLevel serverWorld) {
+                System.out.println("REMOVING: " + this.getUUID());
                 EntityRegistryState state =
                         EntityRegistryState.get(serverWorld);
 
-                state.remove(this.getUuid());
+                state.remove(this.getUUID());
             }
         }
 
         super.remove(reason);
     }
 
-    public void storePlayerInventory(PlayerEntity player) {
+    public void storePlayerInventory(Player player) {
 
         for (int i = 0; i < 41; i++) {
 
             ItemStack moved =
-                    player.getInventory().removeStack(i);
+                    player.getInventory().removeItemNoUpdate(i);
 
             this.inventory.set(i, moved);
         }
 
-        player.getInventory().markDirty();
-        player.currentScreenHandler.sendContentUpdates();
+        player.getInventory().setChanged();
+        player.containerMenu.broadcastChanges();
     }
 
 
-    public void loadPlayerInventory(PlayerEntity player) {
+    public void loadPlayerInventory(Player player) {
 
         for (int i = 0; i < 41; i++) {
 
             ItemStack moved =
                     this.inventory.get(i);
 
-            player.getInventory().setStack(i, moved);
+            player.getInventory().setItem(i, moved);
         }
 
         this.inventory.clear();
 
-        player.getInventory().markDirty();
-        player.currentScreenHandler.sendContentUpdates();
+        player.getInventory().setChanged();
+        player.containerMenu.broadcastChanges();
     }
 
     public void dropStoredInventory() {
@@ -138,7 +138,7 @@ public class ShellEntity extends AnimalEntity {
         for (ItemStack stack : this.inventory) {
 
             if (!stack.isEmpty()) {
-                this.dropStack(stack);
+                this.spawnAtLocation(stack);
             }
         }
 
@@ -146,28 +146,28 @@ public class ShellEntity extends AnimalEntity {
     }
 
     @Override
-    public void onDeath(DamageSource source) {
-        super.onDeath(source);
+    public void die(DamageSource source) {
+        super.die(source);
 
-        if (!this.getWorld().isClient) {
+        if (!this.level().isClientSide) {
             dropStoredInventory();
 
             ItemStack brokenShell = new ItemStack(ModItems.SHELL_ITEM_BROKEN);
             ItemEntity itemEntity = new ItemEntity(
-                    this.getWorld(),
+                    this.level(),
                     this.getX(),
                     this.getY(),
                     this.getZ(),
                     brokenShell
             );
-            this.getWorld().spawnEntity(itemEntity);
+            this.level().addFreshEntity(itemEntity);
 
 
-            ServerPlayerEntity ownerPlayer = (ServerPlayerEntity) this.getWorld().getPlayerByUuid(ModCardinalComponents.SHELL_OWNER_COMPONENT.get(this).get());
+            ServerPlayer ownerPlayer = (ServerPlayer) this.level().getPlayerByUUID(ModCardinalComponents.SHELL_OWNER_COMPONENT.get(this).get());
 
             if (ownerPlayer != null) {
-                ownerPlayer.sendMessage(
-                        this.getDamageTracker().getDeathMessage(),
+                ownerPlayer.displayClientMessage(
+                        this.getCombatTracker().getDeathMessage(),
                         false
                 );
             }
@@ -178,41 +178,41 @@ public class ShellEntity extends AnimalEntity {
 
 
     @Override
-    public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        if (this.getWorld().isClient) {
-            return ActionResult.SUCCESS;
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if (this.level().isClientSide) {
+            return InteractionResult.SUCCESS;
         }
 
 
-        if (!ModCardinalComponents.SHELL_OWNER_COMPONENT.get(this).get().equals(player.getUuid())) {
-            return ActionResult.PASS;
+        if (!ModCardinalComponents.SHELL_OWNER_COMPONENT.get(this).get().equals(player.getUUID())) {
+            return InteractionResult.PASS;
         }
 
-        ItemStack stack = player.getStackInHand(hand);
+        ItemStack stack = player.getItemInHand(hand);
 
         // Must be empty hand
-        if (!stack.isEmpty()) return ActionResult.PASS;
+        if (!stack.isEmpty()) return InteractionResult.PASS;
 
         // Must be sneaking
-        if (!player.isSneaking()) return ActionResult.PASS;
+        if (!player.isShiftKeyDown()) return InteractionResult.PASS;
 
 
         ItemStack egg = new ItemStack(ModItems.SHELL_ITEM);
 
-        egg.set(DataComponentTypes.CUSTOM_NAME, this.getCustomName());
+        egg.set(DataComponents.CUSTOM_NAME, this.getCustomName());
 
         // Drop or give item
-        if (!player.getInventory().insertStack(egg)) {
-            this.dropStack(egg);
+        if (!player.getInventory().add(egg)) {
+            this.spawnAtLocation(egg);
         }
-        if (!this.getWorld().isClient) {
+        if (!this.level().isClientSide) {
             dropStoredInventory();
         }
 
 
         this.discard();
 
-        return super.interactMob(player, hand);
+        return super.mobInteract(player, hand);
     }
 
 

@@ -5,7 +5,6 @@ import corpora.modid.command.ShellScreenCommand;
 import corpora.modid.entity.ModEntities;
 import corpora.modid.entity.custom.ShellEntity;
 import corpora.modid.init.*;
-import corpora.modid.networking.ModNetworking;
 import corpora.modid.networking.custom.SelectShellC2SPayload;
 import corpora.modid.networking.custom.ShellScreenS2CPacket;
 import corpora.modid.util.ShellDropEvent;
@@ -17,7 +16,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +61,7 @@ public class Corpora implements ModInitializer {
                 SelectShellC2SPayload.ID,
                 (payload, context) -> {
 
-                    ServerPlayerEntity player = context.player();
+                    ServerPlayer player = context.player();
 
                     context.server().execute(() -> {
 

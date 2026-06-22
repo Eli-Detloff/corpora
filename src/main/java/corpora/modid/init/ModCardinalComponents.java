@@ -8,8 +8,8 @@ import corpora.modid.component.cardinal.components.MyShellOwnerComponent;
 import corpora.modid.component.cardinal.interfaces.CurrentShellComponent;
 import corpora.modid.component.cardinal.interfaces.ServerComponent;
 import corpora.modid.component.cardinal.interfaces.ShellOwnerComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
@@ -20,12 +20,12 @@ public class ModCardinalComponents implements EntityComponentInitializer {
 
 
     public static final ComponentKey<ServerComponent> SERVERCOMP = ComponentRegistry
-            .getOrCreate(Identifier.of(Corpora.MOD_ID, "server_comp"), ServerComponent.class);
+            .getOrCreate(ResourceLocation.fromNamespaceAndPath(Corpora.MOD_ID, "server_comp"), ServerComponent.class);
 
     public static final ComponentKey<ShellOwnerComponent> SHELL_OWNER_COMPONENT = ComponentRegistry
-            .getOrCreate(Identifier.of(Corpora.MOD_ID, "shell_owner_component"), ShellOwnerComponent.class);
+            .getOrCreate(ResourceLocation.fromNamespaceAndPath(Corpora.MOD_ID, "shell_owner_component"), ShellOwnerComponent.class);
     public static final ComponentKey<CurrentShellComponent> CURRENT_SHELL_COMPONENT = ComponentRegistry
-            .getOrCreate(Identifier.of(Corpora.MOD_ID, "current_shell_component"), CurrentShellComponent.class);
+            .getOrCreate(ResourceLocation.fromNamespaceAndPath(Corpora.MOD_ID, "current_shell_component"), CurrentShellComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {

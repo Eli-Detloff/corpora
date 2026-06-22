@@ -1,4 +1,4 @@
-package corpora.modid.networking;
+package corpora.modid.init;
 
 import corpora.modid.Corpora;
 

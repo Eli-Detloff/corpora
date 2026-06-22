@@ -6,75 +6,75 @@ import corpora.modid.init.ModCardinalComponents;
 import io.github.apace100.origins.component.OriginComponent;
 import io.github.apace100.origins.origin.Origin;
 import io.github.apace100.origins.registry.ModComponents;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RedstoneTorchBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RedstoneTorchBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 
 public class ServerBlock extends Block {
-    public static final MapCodec<ServerBlock> CODEC = createCodec(ServerBlock::new);
+    public static final MapCodec<ServerBlock> CODEC = simpleCodec(ServerBlock::new);
     public static final BooleanProperty POWERED;
 
     static {
         POWERED = RedstoneTorchBlock.LIT;
     }
 
-    public ServerBlock(Settings settings) {
+    public ServerBlock(Properties settings) {
         super(settings);
     }
 
-    public MapCodec<ServerBlock> getCodec() {
+    public MapCodec<ServerBlock> codec() {
         return CODEC;
     }
 
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        if (ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos())) {
-            ctx.getWorld().scheduleBlockTick(ctx.getBlockPos(), this, 1);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        if (ctx.getLevel().hasNeighborSignal(ctx.getClickedPos())) {
+            ctx.getLevel().scheduleTick(ctx.getClickedPos(), this, 1);
         }
-        return this.getDefaultState().with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
+        return this.defaultBlockState().setValue(POWERED, ctx.getLevel().hasNeighborSignal(ctx.getClickedPos()));
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos,
-                                  Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        if (!world.isClient) {
-            boolean powered = world.isReceivingRedstonePower(pos);
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos,
+                                   Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        if (!world.isClientSide) {
+            boolean powered = world.hasNeighborSignal(pos);
 
-            if (powered != state.get(POWERED)) {
-                world.setBlockState(pos, state.with(POWERED, powered), 2);
+            if (powered != state.getValue(POWERED)) {
+                world.setBlock(pos, state.setValue(POWERED, powered), 2);
 
                 if (powered) {
-                    world.scheduleBlockTick(pos, this, 1);
+                    world.scheduleTick(pos, this, 1);
                 }
             }
         }
     }
 
-    public static boolean isMyOrigin(PlayerEntity player) {
+    public static boolean isMyOrigin(Player player) {
         OriginComponent component = ModComponents.ORIGIN.get(player);
 
         for (Origin origin : component.getOrigins().values()) {
             Corpora.LOGGER.info("Origin found: {}", origin.getId());
         }
 
-        Identifier myOriginId = Identifier.of("uiorigin", "ui_origin");
+        ResourceLocation myOriginId = ResourceLocation.fromNamespaceAndPath("uiorigin", "ui_origin");
 
         boolean result = component.getOrigins()
                 .values()
@@ -87,45 +87,45 @@ public class ServerBlock extends Block {
     }
 
     @Override
-    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (state.get(POWERED)) {
-            if (world.isReceivingRedstonePower(pos)) {
+    protected void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        if (state.getValue(POWERED)) {
+            if (world.hasNeighborSignal(pos)) {
 
                 world.playSound(
                         null,
                         pos,
-                        SoundEvents.BLOCK_BEACON_AMBIENT,
-                        SoundCategory.BLOCKS,
+                        SoundEvents.BEACON_AMBIENT,
+                        SoundSource.BLOCKS,
                         0.5f,
                         1.0f
                 );
 
                 // Play again in 40 ticks (2 seconds)
-                world.scheduleBlockTick(pos, this, 40);
+                world.scheduleTick(pos, this, 40);
 
             } else {
-                world.setBlockState(pos, state.with(POWERED, false), 2);
+                world.setBlock(pos, state.setValue(POWERED, false), 2);
             }
         }
     }
 
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(POWERED);
     }
 
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!world.isClientSide) {
             if (!isMyOrigin(player)) {
                 Corpora.LOGGER.info("Denied access");
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
             Corpora.LOGGER.info("Allowed access");
 
 
-            ServerWorld serverWorld = (ServerWorld) world;
+            ServerLevel serverWorld = (ServerLevel) world;
 
             if (ModCardinalComponents.SERVERCOMP.get(player).getPos() != null) {
                 if (ModCardinalComponents.SERVERCOMP.get(player).getPos().equals(pos)) {
@@ -134,13 +134,13 @@ public class ServerBlock extends Block {
                     world.playSound(
                             null,
                             pos,
-                            SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN,
-                            SoundCategory.BLOCKS,
+                            SoundEvents.RESPAWN_ANCHOR_SET_SPAWN,
+                            SoundSource.BLOCKS,
                             0.5f,
                             1.0f
                     );
-                    serverWorld.spawnParticles(
-                            new DustParticleEffect(
+                    serverWorld.sendParticles(
+                            new DustParticleOptions(
                                     new Vector3f(1.0f, 0.0f, 0.0f), // red RGB
                                     1.0f                            // size
                             ),
@@ -156,17 +156,17 @@ public class ServerBlock extends Block {
 
                 } else {
                     ModCardinalComponents.SERVERCOMP.get(player).setPos(pos);
-                    ModCardinalComponents.SERVERCOMP.get(player).setDimension(world.getRegistryKey());
+                    ModCardinalComponents.SERVERCOMP.get(player).setDimension(world.dimension());
                     world.playSound(
                             null,
                             pos,
-                            SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE,
-                            SoundCategory.BLOCKS,
+                            SoundEvents.RESPAWN_ANCHOR_CHARGE,
+                            SoundSource.BLOCKS,
                             0.5f,
                             1.0f
                     );
-                    serverWorld.spawnParticles(
-                            new DustParticleEffect(
+                    serverWorld.sendParticles(
+                            new DustParticleOptions(
                                     new Vector3f(0.0f, 1.0f, 0.0f), // red RGB
                                     1.0f                            // size
                             ),
@@ -182,17 +182,17 @@ public class ServerBlock extends Block {
                 }
             } else {
                 ModCardinalComponents.SERVERCOMP.get(player).setPos(pos);
-                ModCardinalComponents.SERVERCOMP.get(player).setDimension(world.getRegistryKey());
+                ModCardinalComponents.SERVERCOMP.get(player).setDimension(world.dimension());
                 world.playSound(
                         null,
                         pos,
-                        SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE,
-                        SoundCategory.BLOCKS,
+                        SoundEvents.RESPAWN_ANCHOR_CHARGE,
+                        SoundSource.BLOCKS,
                         0.5f,
                         1.0f
                 );
-                serverWorld.spawnParticles(
-                        new DustParticleEffect(
+                serverWorld.sendParticles(
+                        new DustParticleOptions(
                                 new Vector3f(0.0f, 1.0f, 0.0f), // red RGB
                                 1.0f                            // size
                         ),
@@ -207,6 +207,6 @@ public class ServerBlock extends Block {
                 );
             }
         }
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 }

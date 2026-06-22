@@ -3,9 +3,9 @@ package corpora.modid.util.distanceTracker;
 import corpora.modid.init.ModCardinalComponents;
 import corpora.modid.util.config.ConfigManager;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 public class DistanceManager {
 
@@ -17,11 +17,11 @@ public class DistanceManager {
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
 
-            if (server.getTicks() % 20 != 0) {
+            if (server.getTickCount() % 20 != 0) {
                 return;
             }
 
-            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 
                 BlockPos target = ModCardinalComponents.SERVERCOMP.get(player).getPos();
 
@@ -30,7 +30,7 @@ public class DistanceManager {
                 }
 
                 double distance = Math.sqrt(
-                        target.getSquaredDistance(player.getPos())
+                        target.distToCenterSqr(player.position())
                 );
 
                 DISPLAY.update(player, distance);
@@ -38,14 +38,14 @@ public class DistanceManager {
         });
     }
 
-    private static void updatePlayer(ServerPlayerEntity player, BlockPos target) {
+    private static void updatePlayer(ServerPlayer player, BlockPos target) {
 
         double distance = Math.sqrt(
-                target.getSquaredDistance(player.getPos())
+                target.distToCenterSqr(player.position())
         );
 
-        player.sendMessage(
-                Text.literal("Distance: " + (int) distance),
+        player.displayClientMessage(
+                Component.literal("Distance: " + (int) distance),
                 true
         );
     }

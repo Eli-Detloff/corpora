@@ -1,26 +1,27 @@
 package corpora.modid.entity.client;
 
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import corpora.modid.Corpora;
 import corpora.modid.entity.custom.ShellEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.MobEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-public class ShellRenderer extends MobEntityRenderer<ShellEntity, ShellModel<ShellEntity>> {
-    public ShellRenderer(EntityRendererFactory.Context context) {
-        super(context, new ShellModel<>(context.getPart(ShellModel.SHELL)), 0.75f);
+public class ShellRenderer extends MobRenderer<ShellEntity, ShellModel<ShellEntity>> {
+    public ShellRenderer(EntityRendererProvider.Context context) {
+        super(context, new ShellModel<>(context.bakeLayer(ShellModel.SHELL)), 0.75f);
     }
 
     @Override
-    public Identifier getTexture(ShellEntity entity) {
-        return Identifier.of(Corpora.MOD_ID, "textures/entity/shell/robot.png");
+    public @NotNull ResourceLocation getTextureLocation(ShellEntity entity) {
+        return ResourceLocation.fromNamespaceAndPath(Corpora.MOD_ID, "textures/entity/shell/robot.png");
     }
 
     @Override
-    public void render(ShellEntity livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
+    public void render(ShellEntity livingEntity, float f, float g, PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i) {
         if (livingEntity.isBaby()) {
             matrixStack.scale(0.5f, 0.5f, 0.5f);
         } else {

@@ -7,10 +7,10 @@ import corpora.modid.init.ModCardinalComponents;
 import corpora.modid.init.ModSounds;
 import corpora.modid.util.config.ConfigManager;
 import io.github.apace100.apoli.Apoli;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 
 import java.util.UUID;
 
@@ -18,16 +18,16 @@ import static io.github.apace100.apoli.Apoli.server;
 
 public class ShellTeleportHandler {
     public void ShellTeleport(
-            ServerPlayerEntity player,
+            ServerPlayer player,
             UUID target
     ) {
-        player.sendMessage(Text.literal("Teleporting..."));
+        player.sendSystemMessage(Component.literal("Teleporting..."));
 
 
         //find selected shell and load data
         ShellDataComponent targetShell = findShell(target);
         if (targetShell == null) {
-            player.sendMessage(Text.literal("can not find shell of uuid " + target));
+            player.sendSystemMessage(Component.literal("can not find shell of uuid " + target));
             Corpora.LOGGER.info("can not find shell of uuid " + target);
             return;
         }
@@ -37,27 +37,27 @@ public class ShellTeleportHandler {
 
         if (ModCardinalComponents.CURRENT_SHELL_COMPONENT.get(player).get() != null) {
             ShellEntity entity =
-                    new ShellEntity(ModEntities.SHELL, player.getWorld());
+                    new ShellEntity(ModEntities.SHELL, player.level());
 
-            entity.setPos(player.getX(), player.getY(), player.getZ());
-            entity.setYaw(player.getYaw());
-            entity.setPitch(player.getPitch());
-            entity.setBodyYaw(player.getBodyYaw());
-            entity.setHeadYaw(player.getHeadYaw());
-            entity.setCustomName(Text.of(ModCardinalComponents.CURRENT_SHELL_COMPONENT.get(player).get()));
+            entity.setPosRaw(player.getX(), player.getY(), player.getZ());
+            entity.setYRot(player.getYRot());
+            entity.setXRot(player.getXRot());
+            entity.setYBodyRot(player.getVisualRotationYInDegrees());
+            entity.setYHeadRot(player.getYHeadRot());
+            entity.setCustomName(Component.nullToEmpty(ModCardinalComponents.CURRENT_SHELL_COMPONENT.get(player).get()));
             entity.setHealth(player.getHealth());
-            ModCardinalComponents.SHELL_OWNER_COMPONENT.get(entity).set(player.getUuid());
+            ModCardinalComponents.SHELL_OWNER_COMPONENT.get(entity).set(player.getUUID());
             entity.storePlayerInventory(player);
 
-            player.getWorld().spawnEntity(entity);
+            player.level().addFreshEntity(entity);
         } else {
             player.getInventory().dropAll();
         }
 
-        ServerWorld targetWorld = Apoli.server.getWorld(targetShell.dimension());
+        ServerLevel targetWorld = Apoli.server.getLevel(targetShell.dimension());
 
         assert targetWorld != null;
-        player.teleport(
+        player.teleportTo(
                 targetWorld,
                 targetShell.pos().getX(),
                 targetShell.pos().getY(),
@@ -67,7 +67,7 @@ public class ShellTeleportHandler {
         );
 
         //debug things
-        player.sendMessage(Text.literal(
+        player.displayClientMessage(Component.literal(
                 "shell " + targetShell.name() + " has " + targetShell.health() + " health"
         ), false);
 
@@ -75,7 +75,7 @@ public class ShellTeleportHandler {
                 null,
                 targetShell.pos(),
                 ModSounds.SHELL_POWER_UP,
-                SoundCategory.BLOCKS,
+                SoundSource.BLOCKS,
                 0.5f,
                 1.0f
         );
@@ -85,7 +85,7 @@ public class ShellTeleportHandler {
 
         ModCardinalComponents.CURRENT_SHELL_COMPONENT.get(player).set(targetShell.name());
 
-        player.addExperienceLevels(-ConfigManager.getConfig().tpExperienceLevelCost);
+        player.giveExperienceLevels(-ConfigManager.getConfig().tpExperienceLevelCost);
 
 
         ShellRemoval.add(targetWorld, targetShell.uuid(), 200, player);
@@ -94,7 +94,7 @@ public class ShellTeleportHandler {
 
 
     private ShellDataComponent findShell(UUID selectedUuid) {
-        for (var world : server.getWorlds()) {
+        for (var world : server.getAllLevels()) {
 
             EntityRegistryState state = EntityRegistryState.get(world);
             if (state.get(selectedUuid) != null) {

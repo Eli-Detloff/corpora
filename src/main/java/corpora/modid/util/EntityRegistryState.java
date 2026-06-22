@@ -1,32 +1,32 @@
 package corpora.modid.util;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 
 import java.util.*;
 
-public class EntityRegistryState extends PersistentState {
+public class EntityRegistryState extends SavedData {
 
     private final Map<UUID, ShellDataComponent> byUuid = new HashMap<>();
 
     public EntityRegistryState() {
     }
 
-    public static EntityRegistryState get(ServerWorld world) {
-        PersistentStateManager manager = world.getPersistentStateManager();
+    public static EntityRegistryState get(ServerLevel world) {
+        DimensionDataStorage manager = world.getDataStorage();
 
-        return manager.getOrCreate(
-                new Type<>(
+        return manager.computeIfAbsent(
+                new Factory<>(
                         EntityRegistryState::new,
                         (nbt, registryLookup) -> {
                             EntityRegistryState state = new EntityRegistryState();
@@ -40,14 +40,14 @@ public class EntityRegistryState extends PersistentState {
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        NbtList list = new NbtList();
+    public CompoundTag save(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        ListTag list = new ListTag();
 
         for (ShellDataComponent data : byUuid.values()) {
-            NbtCompound entry = new NbtCompound();
+            CompoundTag entry = new CompoundTag();
 
-            entry.putUuid("uuid", data.uuid());
-            entry.putUuid("master_uuid", data.owner());
+            entry.putUUID("uuid", data.uuid());
+            entry.putUUID("master_uuid", data.owner());
 
             entry.putInt("x", data.pos().getX());
             entry.putInt("y", data.pos().getY());
@@ -60,7 +60,7 @@ public class EntityRegistryState extends PersistentState {
 
             entry.putString(
                     "dimension",
-                    data.dimension().getValue().toString()
+                    data.dimension().location().toString()
             );
 
             entry.putString("name", data.name());
@@ -73,19 +73,19 @@ public class EntityRegistryState extends PersistentState {
         return nbt;
     }
 
-    public void readNbt(NbtCompound nbt) {
+    public void readNbt(CompoundTag nbt) {
         byUuid.clear();
 
-        NbtList list = nbt.getList("entities", NbtElement.COMPOUND_TYPE);
+        ListTag list = nbt.getList("entities", Tag.TAG_COMPOUND);
 
-        for (NbtElement element : list) {
-            NbtCompound entry = (NbtCompound) element;
+        for (Tag element : list) {
+            CompoundTag entry = (CompoundTag) element;
 
             ShellDataComponent data = new ShellDataComponent(
-                    entry.getUuid("uuid"),
+                    entry.getUUID("uuid"),
 
-                    entry.containsUuid("master_uuid")
-                            ? entry.getUuid("master_uuid")
+                    entry.hasUUID("master_uuid")
+                            ? entry.getUUID("master_uuid")
                             : new UUID(0, 0),
 
                     new BlockPos(
@@ -99,9 +99,9 @@ public class EntityRegistryState extends PersistentState {
                     entry.contains("head_yaw") ? entry.getFloat("head_yaw") : 0F,
                     entry.contains("body_yaw") ? entry.getFloat("body_yaw") : 0F,
 
-                    RegistryKey.of(
-                            RegistryKeys.WORLD,
-                            Identifier.of(entry.getString("dimension"))
+                    ResourceKey.create(
+                            Registries.DIMENSION,
+                            ResourceLocation.parse(entry.getString("dimension"))
                     ),
 
                     entry.getString("name"),
@@ -118,12 +118,12 @@ public class EntityRegistryState extends PersistentState {
         }
 
         byUuid.put(data.uuid(), data);
-        markDirty();
+        setDirty();
     }
 
     public void remove(UUID uuid) {
         if (byUuid.remove(uuid) != null) {
-            markDirty();
+            setDirty();
         }
     }
 
@@ -131,7 +131,7 @@ public class EntityRegistryState extends PersistentState {
         return byUuid.get(uuid);
     }
 
-    public int cleanupNullEntries(ServerWorld world) {
+    public int cleanupNullEntries(ServerLevel world) {
         int removed = 0;
 
         Iterator<Map.Entry<UUID, ShellDataComponent>> iterator = byUuid.entrySet().iterator();
@@ -149,7 +149,7 @@ public class EntityRegistryState extends PersistentState {
         }
 
         if (removed > 0) {
-            markDirty();
+            setDirty();
         }
 
         return removed;

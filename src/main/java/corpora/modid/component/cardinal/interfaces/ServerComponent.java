@@ -1,8 +1,8 @@
 package corpora.modid.component.cardinal.interfaces;
 
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.ladysnake.cca.api.v3.component.Component;
 
 public interface ServerComponent extends Component {
@@ -10,9 +10,9 @@ public interface ServerComponent extends Component {
 
     void setPos(BlockPos pos);
 
-    void setDimension(RegistryKey<World> dimension);
+    void setDimension(ResourceKey<Level> dimension);
 
     BlockPos getPos();
 
-    RegistryKey<World> getDimension();
+    ResourceKey<Level> getDimension();
 }

@@ -2,23 +2,23 @@ package corpora.modid.component.cardinal.components;
 
 
 import corpora.modid.component.cardinal.interfaces.ServerComponent;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 
 public class MyServerComponent implements ServerComponent {
 
     private BlockPos serverPos;
-    private RegistryKey<World> serverDimension;
+    private ResourceKey<Level> serverDimension;
 
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         if (tag.contains("serverPos")) {
             int[] tagPos = tag.getIntArray("serverPos");
             this.serverPos = new BlockPos(
@@ -31,11 +31,11 @@ public class MyServerComponent implements ServerComponent {
         }
 
         if (tag.contains("serverDimension")) {
-            Identifier id = Identifier.of(tag.getString("serverDimension"));
+            ResourceLocation id = ResourceLocation.parse(tag.getString("serverDimension"));
 
-            this.serverDimension = RegistryKey.of(
-                    RegistryKeys.WORLD,
-                    Identifier.of(tag.getString("serverDimension"))
+            this.serverDimension = ResourceKey.create(
+                    Registries.DIMENSION,
+                    ResourceLocation.parse(tag.getString("serverDimension"))
             );
         }
 
@@ -43,7 +43,7 @@ public class MyServerComponent implements ServerComponent {
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         if (this.serverPos != null) {
             int[] tagPos = new int[3];
             tagPos[0] = this.serverPos.getX();
@@ -54,7 +54,7 @@ public class MyServerComponent implements ServerComponent {
         }
 
         if (this.serverDimension != null) {
-            tag.putString("serverDimension", serverDimension.getValue().toString());
+            tag.putString("serverDimension", serverDimension.location().toString());
         }
     }
 
@@ -64,7 +64,7 @@ public class MyServerComponent implements ServerComponent {
     }
 
     @Override
-    public void setDimension(RegistryKey<World> dimension) {
+    public void setDimension(ResourceKey<Level> dimension) {
         this.serverDimension = dimension;
     }
 
@@ -74,7 +74,7 @@ public class MyServerComponent implements ServerComponent {
     }
 
     @Override
-    public RegistryKey<World> getDimension() {
+    public ResourceKey<Level> getDimension() {
         return serverDimension;
     }
 }

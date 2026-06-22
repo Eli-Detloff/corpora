@@ -10,7 +10,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class CorporaClient implements ClientModInitializer {
                     List<ShellDataComponent> shells = payload.shells();
 
                     if (shells.isEmpty()) {
-                        context.player().sendMessage(Text.of("List empty"));
+                        context.player().sendSystemMessage(Component.nullToEmpty("List empty"));
                         return;
                     }
                     context.client().setScreen(new ShellGui(shells));

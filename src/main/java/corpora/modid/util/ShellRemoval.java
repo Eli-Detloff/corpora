@@ -4,10 +4,10 @@ package corpora.modid.util;
 import corpora.modid.Corpora;
 import corpora.modid.entity.custom.ShellEntity;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,7 +30,7 @@ public class ShellRemoval {
         while (it.hasNext()) {
             ShellRemovalData op = it.next();
 
-            ServerWorld world = server.getWorld(op.dimension);
+            ServerLevel world = server.getLevel(op.dimension);
             if (world == null) continue;
 
             Entity e = world.getEntity(op.shellUuid);
@@ -39,12 +39,12 @@ public class ShellRemoval {
                 ((ShellEntity) e).loadPlayerInventory(op.player);
                 e.discard();
 
-                long elapsed = server.getTicks() - op.startTick;
+                long elapsed = server.getTickCount() - op.startTick;
                 Corpora.LOGGER.info("Deleted entity after {} ticks", elapsed);
 
                 it.remove();
-                op.player.getInventory().markDirty();
-                op.player.currentScreenHandler.sendContentUpdates();
+                op.player.getInventory().setChanged();
+                op.player.containerMenu.broadcastChanges();
                 continue;
             }
 
@@ -58,12 +58,12 @@ public class ShellRemoval {
         }
     }
 
-    public static void add(ServerWorld world, UUID uuid, int delayTicks, ServerPlayerEntity player) {
+    public static void add(ServerLevel world, UUID uuid, int delayTicks, ServerPlayer player) {
         ShellRemovalData op = new ShellRemovalData();
         op.shellUuid = uuid;
-        op.dimension = world.getRegistryKey();
+        op.dimension = world.dimension();
         op.ticksRemaining = delayTicks;
-        op.startTick = world.getServer().getTicks();
+        op.startTick = world.getServer().getTickCount();
         op.player = player;
         PENDING.add(op);
     }
